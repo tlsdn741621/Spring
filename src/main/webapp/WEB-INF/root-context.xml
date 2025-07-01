@@ -47,7 +47,7 @@
     <!--     WEB-INF 하위에서 resources ,  css,js,image 등, 웹브라우저에게 제공하는 목적으로 사용함.-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
-        <!--        <property name="mapperLocations" value="classpath:/mappers/**/*.xml"></property>-->
+        <property name="mapperLocations" value="classpath:/mappers/**/*.xml"></property>
     </bean>
 
     <!--    모델 맵퍼 이용하는 첫번째 방법, 해당 메서드에 애너테이션 안에 sql 문장을 등록해서 이용. -->
@@ -55,6 +55,9 @@
     <!--    그래서, 시스템에 등록해서 이용해야함. -->
     <!--    결론, 우리는 이방식으로 안하고, 파일 분리 형식으로 작업 할 예정. -->
         <mybatis:scan base-package="com.busanit501.spring_project.mapper"></mybatis:scan>
+
+    <!--    모델 맵퍼 경로 추가 -->
+    <context:component-scan base-package="com.busanit501.spring_project.config"/>
 
 
 </beans>
