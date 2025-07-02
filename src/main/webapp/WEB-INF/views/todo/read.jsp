@@ -1,16 +1,7 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: it
-  Date: 25. 7. 1.
-  Time: 오전 10:42
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--resources/test.html, 베이스 레이아웃 , 가져와서, 카드 바디 부분에 --%>
-<%--데이터를 추가 하는 중. --%>
 <!--베이스 레이아웃 접근 주소 ,
 http://localhost:8080/resources/test.html-->
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -65,35 +56,46 @@ http://localhost:8080/resources/test.html-->
                 <!--        카드 시작 부분-->
                 <div class="card">
                     <div class="card-header">
-                        Todo 목록
+                        tno로 번호로 하나조회, 상세조회
                     </div>
                     <div class="card-body">
-                        <%--                        여기에 목록을 출력하기--%>
-                        <h5 class="card-title">목록</h5>
-                        <%--                        ${dtoList}--%>
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col">TNO</th>
-                                <th scope="col">Title</th>
-                                <th scope="col">Writer</th>
-                                <th scope="col">DueDate</th>
-                                <th scope="col">Finished</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <c:forEach items="${dtoList}" var="dto">
-                                <tr>
-                                    <th scope="row"><c:out value="${dto.tno}"></c:out></th>
-                                    <td><c:out value="${dto.title}"/></td>
-                                    <td><c:out value="${dto.writer}"/></td>
-                                    <td><c:out value="${dto.dueDate}"/></td>
-                                    <td><c:out value="${dto.finished}"/></td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tno</span>
+                            <input type="text" name="tno" class="form-control" readonly
+                                   value=<c:out value="${dto.tno}"></c:out> >
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Title</span>
+                            <input type="text" name="title" class="form-control" readonly
+                                   value='<c:out value="${dto.title}"></c:out>'>
+                        </div>
 
-                        </table>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">DueDate</span>
+                            <input type="date" name="dueDate" class="form-control" readonly
+                                   value=<c:out value="${dto.dueDate}"></c:out>>
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Writer</span>
+                            <input type="text" name="writer" class="form-control" readonly
+                                   value=<c:out value="${dto.writer}"></c:out>>
+                        </div>
+                        <div class="input-group mb-3">
+                            <label class="form-check-label">Finished &nbsp</label>
+                            <input type="checkbox" name="finished" class="form-check-input" readonly
+                            ${dto.finished ? "checked" : ""}>
+                        </div>
+                        <div class="my-4">
+                            <div class="float-end">
+                                <button type="button" class="btn btn-primary">수정하기</button>
+                                <button type="button" class="btn btn-secondary">목록가기</button>
+                            </div>
+                        </div>
+                        <%--                        </form>--%>
+                        <%--                        Todo 입력 폼 여기에 작성--%>
+
+                    </div>
                     </div>
                 </div>
                 <!--        카드 끝 부분-->
@@ -102,9 +104,9 @@ http://localhost:8080/resources/test.html-->
         </div>
         <!--        class="row content"-->
     </div>
-    <%--    <div class="row content">--%>
-    <%--        <h1>Content</h1>--%>
-    <%--    </div>--%>
+<%--    <div class="row content">--%>
+<%--        <h1>Content</h1>--%>
+<%--    </div>--%>
     <div class="row footer">
         <!--        <h1>Footer</h1>-->
         <div class="row fixed-bottom" style="z-index: -100">

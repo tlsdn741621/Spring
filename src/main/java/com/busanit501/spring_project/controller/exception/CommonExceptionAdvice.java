@@ -40,7 +40,7 @@ public class CommonExceptionAdvice {
     // 예외2, 범용적으로 예외처리하는 메서드 추가.
     @ResponseBody
     @ExceptionHandler(Exception.class)
-    public String exceptCommon(Exception exception){
+    public ResponseEntity<String> exceptCommon(Exception exception){
         // 서버 콘솔에서 예외 메세지 확인
         log.error("==exceptCommon, 일반적인 공통 예외 처리하기. ==================");
         log.error(exception.getMessage());
@@ -48,6 +48,7 @@ public class CommonExceptionAdvice {
         // 화면에서 예외 메세지 확인, html 태그를 문자열 형식으로 전달하면,
         // 웹 브라우저 html 읽어서, 표시함.
         StringBuffer buffer = new StringBuffer("<ul>");
+        buffer.append("<li>" + "exception.getMessage(): 예외 내용 확인1" + "</li>");
         buffer.append("<li>" + exception.getMessage() + "</li>");
 
         // 예외 발생 추적 내용을 같이 포함해서 전달.
@@ -56,22 +57,27 @@ public class CommonExceptionAdvice {
         // forEach( : 전체 요소 -> 하나씩 요소를 꺼내는 작업,
         // 꺼내서, 버퍼라는 문자열 추가하고, 여기까지 중간 집계
         // 최종 처리.
+        buffer.append("<li>" + "stackTraceElement.toString(): 예외 추적 확인2" + "</li>");
         Arrays.stream(exception.getStackTrace()).forEach(
                 stackTraceElement -> {
                     buffer.append("<li>" + stackTraceElement.toString() + "</li>");
                 }
         );
         buffer.append("</ul>");
-        return buffer.toString();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.valueOf("text/html; charset=utf-8"))
+                .body(buffer.toString());
+//        return buffer.toString();
+
 
     }
 
-    // 예외3, 404 , not found 처리,
-    // 리턴 타입, String , 문자열이면, 그 내용의 jsp 화면으로 감
+    //예외3, 404 , not found  처리 ,
+    // 리턴 타입, String , 문자열이면, 그 내용의 jsp 화면으로 감.
     // /WEB-INF/views/custom404.jsp 로 연결됨.
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String notFound() {
+    public  String notFound() {
         return "custom404";
     }
 }

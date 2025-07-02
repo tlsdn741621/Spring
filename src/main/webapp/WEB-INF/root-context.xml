@@ -10,7 +10,7 @@
     <!--    <bean class="com.busanit501.spring_project.sample.SampleService"></bean>-->
 
     <!--    그룹으로 지정해보기, 폴더를 등록해보기-->
-    <context:component-scan base-package="com.busanit501.spring_project.sample"/>
+    <!--    <context:component-scan base-package="com.busanit501.spring_project.sample"/>-->
 
     <!--    히카리 관련 설정은 따로 작성 해도 되지만, 저희 설정 내용을 복붙-->
     <!--    핵심 역할을 하는 디비 연결 풀, 시스템에 인스턴스로 등록-->
@@ -54,10 +54,10 @@
     <!--    시스템에서, 해당 패키지의 애너테이션 존재 유무를 몰라요, -->
     <!--    그래서, 시스템에 등록해서 이용해야함. -->
     <!--    결론, 우리는 이방식으로 안하고, 파일 분리 형식으로 작업 할 예정. -->
-        <mybatis:scan base-package="com.busanit501.spring_project.mapper"></mybatis:scan>
+    <mybatis:scan base-package="com.busanit501.spring_project.mapper"></mybatis:scan>
 
     <!--    모델 맵퍼 경로 추가 -->
     <context:component-scan base-package="com.busanit501.spring_project.config"/>
-
+    <context:component-scan base-package="com.busanit501.spring_project.service"/>
 
 </beans>
