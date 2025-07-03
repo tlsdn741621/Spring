@@ -1,5 +1,6 @@
 package com.busanit501.spring_project.controller;
 
+import com.busanit501.spring_project.dto.PageRequestDTO;
 import com.busanit501.spring_project.dto.TodoDTO;
 import com.busanit501.spring_project.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +33,25 @@ public class TodoController {
     // /WEB-INF/views/todo/list.jsp , 가리킴.
     // 자동 연결, 뷰 리졸버라는 친구의 업무.
     // 메소드명이 아니라, url 주소로 , 화면 연결을함.
-    public void list2(Model model) {
+    // 웹화면에서, url: http://localhost:8080/todo/list?page=3&size=10
+    // page, size 정보를 자동 형변환 함, @Valid PageRequestDTO pageRequestDTO,
+    public void list2(@Valid PageRequestDTO pageRequestDTO,
+                      BindingResult bindingResult,
+                      Model model) {
         log.info("TodoController에서 작업, list 호출 ");
-        List<TodoDTO> dtoList = todoService.getAll();
-        dtoList.forEach(vo -> log.info(vo));
-        // 서비스로 부터 외주 맡겨서, 디비 정보를 받아와서, 화면에 전달, 탑재하기.
-        model.addAttribute("dtoList", todoService.getAll());
+        // 페이징 처리 전
+//        List<TodoDTO> dtoList = todoService.getAll();
+//        dtoList.forEach(vo -> log.info(vo));
+//        // 서비스로 부터 외주 맡겨서, 디비 정보를 받아와서, 화면에 전달, 탑재하기.
+//        model.addAttribute("dtoList", todoService.getAll());
+        // 페이징 처리 후
+        // 유효성체크.
+        if (bindingResult.hasErrors()) {
+            // 기본값으로 할당하기.
+            // size  최소 10, 최대 100, 요청 :1000, 잘못된 요청이면, 기본으로 10으로 변경하기.
+            pageRequestDTO = PageRequestDTO.builder().build();
+        }
+        model.addAttribute("responseDTO", todoService.getList(pageRequestDTO));
     }
 
     // 최종 url : /todo/register
@@ -56,8 +70,9 @@ public class TodoController {
     // 화면에서, TodoDTO 형식의 데이터를 전달을 받으면,
     // 각각 받는게 아니라, TodoDTO 모델 클래스로 한번에 받기 예시.
     @PostMapping("/register")
-    // @Valid TodoDTO todoDTO : 유효성 검사 적용
-    //  BindingResult bindingResult : 통과 못한 이유 원인 남겨져있다.
+    // 작성 순서 유지
+    // 순서1, @Valid TodoDTO todoDTO : 유효성 검사 적용
+    //  순서2, BindingResult bindingResult : 통과 못한 이유 원인 남겨져있다.
     public String registerPost(@Valid TodoDTO todoDTO,
                                BindingResult bindingResult,
                                RedirectAttributes redirectAttributes) {
@@ -79,11 +94,44 @@ public class TodoController {
 
         return "redirect:/todo/list";
     }
-    @GetMapping("/read")
+    @GetMapping({"/read","/modify"})
     public void read(Long tno, Model model) {
+        // 서버에서, 디비로 부터 tno 번호로 하나의 todo 정보를 조회
+        // 정방향, 찍고, 역방향으로 돌아온 상태.
         TodoDTO todoDTO = todoService.selectByTno(tno);
         log.info(todoDTO);
+        // 서버 -> 웹 화면 데이터 전달. 키 : dto , 값 : 객체
+        // 화면에서, 사용시, 키 :dto로 사용하면됨.
         model.addAttribute("dto", todoDTO);
+    }
+
+    @PostMapping("/remove")
+    public String remove(Long tno, RedirectAttributes redirectAttributes) {
+        log.info("삭제 작업 중.,");
+        log.info("tno:"+tno);
+        todoService.remove(tno);
+        return "redirect:/todo/list";
+    }
+
+    @PostMapping("/modify")
+    public String modify(@Valid TodoDTO todoDTO,
+                         BindingResult bindingResult,
+                         RedirectAttributes redirectAttributes) {
+        if(bindingResult.hasErrors()){
+            log.info("수정 적용 부분에서, 유효성 통과 못할 경우");
+            redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
+            // 현재 수정 화면에서, 수정할 내용을 입력 후, 유효성 체크 통과를 못했다면,
+            // 다시 수정 화면으로 이동해야함. 어는 tno 번호 에서 작업하는지 알려줘야함.
+            // 쿼리 스트링으로 ?tno=21 , 달고 화면에 전달함.
+            redirectAttributes.addAttribute("tno", todoDTO.getTno());
+            // 최종 url : /todo/modify?tno=21
+            return "redirect:/todo/modify";
+        }
+        log.info("수정 로직처리 post 작업중 넘어온 데이터 확인 todoDTO: " + todoDTO);
+        todoService.modify(todoDTO);
+        //PRG 패턴,
+        return "redirect:/todo/list";
+
     }
 
 }

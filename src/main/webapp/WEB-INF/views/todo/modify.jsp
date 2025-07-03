@@ -56,53 +56,58 @@ http://localhost:8080/resources/test.html-->
                 <!--        카드 시작 부분-->
                 <div class="card">
                     <div class="card-header">
-                        tno로 번호로 하나조회, 상세조회
+                        tno로 번호로 수정하는 화면
                     </div>
                     <div class="card-body">
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Tno</span>
-                            <input type="text" name="tno" class="form-control" readonly
-                                   value=<c:out value="${dto.tno}"></c:out> >
-                        </div>
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Title</span>
-                            <input type="text" name="title" class="form-control" readonly
-                                   value='<c:out value="${dto.title}"></c:out>'>
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">DueDate</span>
-                            <input type="date" name="dueDate" class="form-control" readonly
-                                   value=<c:out value="${dto.dueDate}"></c:out>>
-                        </div>
-
-                        <div class="input-group mb-3">
-                            <span class="input-group-text">Writer</span>
-                            <input type="text" name="writer" class="form-control" readonly
-                                   value=<c:out value="${dto.writer}"></c:out>>
-                        </div>
-                        <div class="input-group mb-3">
-                            <label class="form-check-label">Finished &nbsp</label>
-                            <input type="checkbox" name="finished" class="form-check-input" readonly
-                            ${dto.finished ? "checked" : ""}>
-                        </div>
-                        <div class="my-4">
-                            <div class="float-end">
-                                <button type="button" class="btn btn-primary">수정하기</button>
-                                <button type="button" class="btn btn-secondary">목록가기</button>
+                        <form action="/todo/modify" method="post">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Tno</span>
+                                <input type="text" name="tno" class="form-control" readonly
+                                       value=
+                                <c:out value="${dto.tno}"></c:out>>
                             </div>
-                        </div>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Title</span>
+                                <input type="text" name="title" class="form-control"
+                                       value='<c:out value="${dto.title}"></c:out>'>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">DueDate</span>
+                                <input type="date" name="dueDate" class="form-control"
+                                       value=<c:out value="${dto.dueDate}"></c:out>>
+                            </div>
+
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Writer</span>
+                                <input type="text" name="writer" class="form-control" readonly
+                                       value=<c:out value="${dto.writer}"></c:out>>
+                            </div>
+                            <div class="form-check">
+                                <label class="form-check-label">Finished &nbsp</label>
+                                <input type="checkbox" name="finished" class="form-check-input"
+                                ${dto.finished ? "checked" : ""}>
+                            </div>
+                            <div class="my-4">
+                                <div class="float-end">
+                                    <button type="button" class="btn btn-danger">삭제하기</button>
+                                    <button type="button" class="btn btn-primary">수정하기</button>
+                                    <button type="button" class="btn btn-secondary">목록가기</button>
+                                </div>
+                            </div>
+                        </form>
                         <script>
                             // 자바스크립트 , 좀더 편하게 사용하는 도구들 많음.
                             // 대표적으로 jQuery, 많이 사용함. -> 리액트 , Vue.js ,
                             // 순수 자바스크립트, 바닐라 자바스크립라고 표현함,
                             // 바닐라로, 특정 요소를 선택하고, 로직 처리함.
-                            document.querySelector(".btn-primary").addEventListener("click",
-                                function (e) {
-                                    // read , 읽기전용. 변결 불가.
-                                    // 수정폼으로 가기. 데이터 변경 가능.
-                                    self.location = "/todo/modify?tno="+${dto.tno}
-                                }, false)
+                            <%--document.querySelector(".btn-primary").addEventListener("click",--%>
+                            <%--    function (e) {--%>
+                            <%--        // read , 읽기전용. 변결 불가.--%>
+                            <%--        // 수정폼으로 가기. 데이터 변경 가능.--%>
+                            <%--        self.location = "/todo/modify?tno=" +--%>
+                            <%--        ${dto.tno}--%>
+                            <%--    }, false)--%>
 
                             document.querySelector(".btn-secondary").addEventListener("click",
                                 function (e) {
@@ -111,6 +116,38 @@ http://localhost:8080/resources/test.html-->
                                     self.location = "/todo/list"
                                 }, false)
 
+                            // 삭제하기 버튼 클릭 이벤트 처리.
+                            const formObj = document.querySelector("form")
+
+                            document.querySelector(".btn-danger").addEventListener("click",
+                                function (e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+
+                                    formObj.action = "/todo/remove"
+                                    formObj.method = "post"
+
+                                    formObj.submit()
+
+                                }, false)
+
+                            //수정하기. 버튼 클릭시, 자바스크립트로 서버에 데이터 전달 해보기.
+                            document.querySelector(".btn-primary").addEventListener("click", function (e){
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                formObj.action = "/todo/modify"
+                                formObj.method = "post"
+                                formObj.submit()
+                            },false)
+
+                            // 유효성 체크 안될 경우, 서버로부터 전달 받은 errors 출력하는 코드 추가
+                            // register.jsp , 로직과 같은 코드, 복붙
+                            const serverValidResult = {}
+                            <c:forEach items="${errors}" var="error">
+                            serverValidResult['${error.getField()}'] = '${error.defaultMessage}'
+                            </c:forEach>
+                            console.log(serverValidResult)
 
                         </script>
                         <%--                        </form>--%>

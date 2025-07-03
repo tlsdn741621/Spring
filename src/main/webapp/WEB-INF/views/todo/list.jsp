@@ -38,10 +38,10 @@ http://localhost:8080/resources/test.html-->
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav">
                                 <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                                    <a class="nav-link active" aria-current="page" href="/todo/list">목록가기</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="#">Features</a>
+                                    <a class="nav-link" href="/todo/register">글쓰기</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="#">Pricing</a>
@@ -82,10 +82,18 @@ http://localhost:8080/resources/test.html-->
                             </tr>
                             </thead>
                             <tbody>
-                            <c:forEach items="${dtoList}" var="dto">
+                            <%--                            페이징 처리전--%>
+                            <%--                            <c:forEach items="${dtoList}" var="dto">--%>
+                            <%--                                페이징 처리 후--%>
+                            <c:forEach items="${responseDTO.dtoList}" var="dto">
                                 <tr>
                                     <th scope="row"><c:out value="${dto.tno}"></c:out></th>
-                                    <td><c:out value="${dto.title}"/></td>
+                                        <%--                                    클릭시 : /todo/read?tno=21--%>
+                                    <td>
+                                        <a href="/todo/read?tno=${dto.tno}" class="text-decoration-none">
+                                            <c:out value="${dto.title}"/>
+                                        </a>
+                                    </td>
                                     <td><c:out value="${dto.writer}"/></td>
                                     <td><c:out value="${dto.dueDate}"/></td>
                                     <td><c:out value="${dto.finished}"/></td>
@@ -94,6 +102,59 @@ http://localhost:8080/resources/test.html-->
                             </tbody>
 
                         </table>
+
+                        <%--                        페이징을 가리키는 네비게이션 , 부트 스트랩에서 가져와서 이용--%>
+                        <%--                        <div class="float-end">--%>
+                        <div>
+
+
+                            <%--                            페이징 네비게이션 화면 영역--%>
+                            <ul class="pagination flex-wrap justify-content-center">
+                                <%--                            이전 버튼--%>
+                                <c:if test="${responseDTO.prev}">
+                                    <li class="page-item">
+                                        <a class="page-link" data-num="${responseDTO.start - 1}">Prev</a>
+                                    </li>
+                                </c:if>
+                                <c:forEach begin="${responseDTO.start}" end="${responseDTO.end}" var="num">
+                                    <li class="page-item ${responseDTO.page == num ? "active" : "" }">
+                                        <a class="page-link" data-num="${num}">
+                                                ${num}
+                                        </a>
+                                    </li>
+                                </c:forEach>
+                                <%--                        다음 버튼 표시--%>
+                                <c:if test="${responseDTO.next}">
+                                    <li class="page-item">
+                                        <a class="page-link" data-num="${responseDTO.end + 1}">Next</a>
+                                    </li>
+                                </c:if>
+                            </ul>
+                            <%--                                페이징 네비게이션 화면 영역--%>
+
+
+                        </div>
+                        <%--                            페이징 이벤트 처리 하기.--%>
+                        <script>
+                            document.querySelector(".pagination").addEventListener("click", function (e){
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const target = e.target; // 클래스가 pagination 선택자 하위 요소들 중에서,
+                                if(target.tagName !== 'A') { // a 태그가 아닌 다른 태그를 클릭시, 이벤트 처리 안한다.
+                                    return
+                                }
+                                // a 태그만 이벤트 처리하겠다. 의도.
+                                // data-num : 페이지 정보,
+                                const num = target.getAttribute("data-num")
+                                // ` 백틱 사용.
+                                self.location = `/todo/list?page=\${num}`
+
+                            },false)
+                        </script>
+
+                        <%--                        다음 버튼 표시--%>
+
                     </div>
                 </div>
                 <!--        카드 끝 부분-->

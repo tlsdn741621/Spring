@@ -1,6 +1,8 @@
 package com.busanit501.spring_project.service;
 
 import com.busanit501.spring_project.domain.TodoVO;
+import com.busanit501.spring_project.dto.PageRequestDTO;
+import com.busanit501.spring_project.dto.PageResponseDTO;
 import com.busanit501.spring_project.dto.TodoDTO;
 import com.busanit501.spring_project.mapper.TodoMapper;
 import lombok.RequiredArgsConstructor;
@@ -32,15 +34,40 @@ public class TodoServiceImpl implements TodoService {
 
     }
 
+    // 페이징 후 전체 조회
     @Override
-    public List<TodoDTO> getAll() {
-        // 디비로 부터 전달 받은 TodoVO -> TodoDTO 로 변환 작업,
-        // 병렬 처리로 진행하기.
-        List<TodoDTO> dtoList = todoMapper.selectAll().stream()
-                .map(vo -> modelMapper.map(vo, TodoDTO.class))
+    public PageResponseDTO<TodoDTO> getList(PageRequestDTO pageRequestDTO) {
+        // 필요한 준비물 목록
+        // 1) 디비로 부터 페이징 처리된 데이터 목록
+        // 2) 디비로 부터 전체 갯수
+        // 3) pageRequestDTO, 페이징 정보, 사이즈 정보, skip 정보가 있어서,
+
+        // 1)디비로 부터 받은 타입 dto -> vo 로 변환이 필요함.
+        List<TodoVO> voList = todoMapper.selectList(pageRequestDTO);
+        List<TodoDTO> dtoList = voList.stream().map(vo -> modelMapper.map(vo, TodoDTO.class))
                 .collect(Collectors.toList());
-        return dtoList;
+        // 2)
+        int total = todoMapper.getCount(pageRequestDTO);
+        // 준비물을 , 박스에 담아서, 서비스 -> 컨트롤러 전달.
+        PageResponseDTO<TodoDTO> pageResponseDTO = PageResponseDTO.<TodoDTO>withAll()
+                .dtoList(dtoList)
+                .total(total)
+                .pageRequestDTO(pageRequestDTO)
+                .build();
+
+        return pageResponseDTO;
     }
+
+    // 페이징 전 전체 조회
+//    @Override
+//    public List<TodoDTO> getAll() {
+//        // 디비로 부터 전달 받은 TodoVO -> TodoDTO 로 변환 작업,
+//        // 병렬 처리로 진행하기.
+//        List<TodoDTO> dtoList = todoMapper.selectAll().stream()
+//                .map(vo -> modelMapper.map(vo, TodoDTO.class))
+//                .collect(Collectors.toList());
+//        return dtoList;
+//    }
 
     @Override
     public TodoDTO selectByTno(Long tno) {
@@ -50,9 +77,13 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public TodoDTO update(TodoDTO todoDTO) {
-        TodoVO todoVO = modelMapper.map(todoDTO, TodoVO.class);
+    public void remove(Long tno) {
+        todoMapper.delete(tno);
+    }
+
+    @Override
+    public void modify(TodoDTO todoDTO) {
+        TodoVO todoVO= modelMapper.map(todoDTO, TodoVO.class);
         todoMapper.update(todoVO);
-        return todoDTO;
     }
 }
