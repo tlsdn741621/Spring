@@ -28,12 +28,26 @@ public class PageRequestDTO {
     @Positive
     private int size = 10;
 
+    // 페이징의 정보를 유지하기,link = page=1&size=10
+    private String link;
+
     // 건너띄기 할 데이터의 갯수,
     // 1페이지 10개,
     // 2페이지, 11개 부터 , skip 10
     // 3페이지 21개, 부터 , skip 20
+    // limit 10
     public int getSkip() {
         return (page - 1) * size;
+    }
+
+    public String getLink() {
+        if (link == null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("page="+this.page);
+            builder.append("&size="+this.size);
+            link = builder.toString();
+        }
+        return link;
     }
 
 }

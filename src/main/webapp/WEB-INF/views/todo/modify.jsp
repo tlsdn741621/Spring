@@ -60,6 +60,12 @@ http://localhost:8080/resources/test.html-->
                     </div>
                     <div class="card-body">
                         <form action="/todo/modify" method="post">
+                            <%--                            기존, get 방식으로 화면으로 전달 할 때 ?page=7&size=10--%>
+                            <%--                            포스트 형식으로 서버에 데이터 전달, page, size 정보 전달함.--%>
+                            <%--                            히든으로 담아서 전달. --%>
+                            <input type="hidden" name="page" value="${pageRequestDTO.page}">
+                            <input type="hidden" name="size" value="${pageRequestDTO.size}">
+
                             <div class="input-group mb-3">
                                 <span class="input-group-text">Tno</span>
                                 <input type="text" name="tno" class="form-control" readonly
@@ -113,7 +119,8 @@ http://localhost:8080/resources/test.html-->
                                 function (e) {
                                     // read , 읽기전용. 변결 불가.
                                     // 수정폼으로 가기. 데이터 변경 가능.
-                                    self.location = "/todo/list"
+                                    // self.location = "/todo/list"
+                                    self.location = "/todo/list?${pageRequestDTO.link}"
                                 }, false)
 
                             // 삭제하기 버튼 클릭 이벤트 처리.
@@ -132,14 +139,14 @@ http://localhost:8080/resources/test.html-->
                                 }, false)
 
                             //수정하기. 버튼 클릭시, 자바스크립트로 서버에 데이터 전달 해보기.
-                            document.querySelector(".btn-primary").addEventListener("click", function (e){
+                            document.querySelector(".btn-primary").addEventListener("click", function (e) {
                                 e.preventDefault();
                                 e.stopPropagation();
 
                                 formObj.action = "/todo/modify"
                                 formObj.method = "post"
                                 formObj.submit()
-                            },false)
+                            }, false)
 
                             // 유효성 체크 안될 경우, 서버로부터 전달 받은 errors 출력하는 코드 추가
                             // register.jsp , 로직과 같은 코드, 복붙

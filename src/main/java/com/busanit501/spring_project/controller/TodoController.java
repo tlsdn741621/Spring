@@ -95,21 +95,34 @@ public class TodoController {
         return "redirect:/todo/list";
     }
     @GetMapping({"/read","/modify"})
-    public void read(Long tno, Model model) {
+    // 목록 -> 상세보기 : tno 번호와, page, size 정보도 같이 전달함.
+    // 한번에 PageRequestDTO 담기,
+    // 스프링은 자동으로, PageRequestDTO 내용을 Model 알아서 화면에 전달해줌.
+    public void read(Long tno,PageRequestDTO pageRequestDTO, Model model) {
         // 서버에서, 디비로 부터 tno 번호로 하나의 todo 정보를 조회
         // 정방향, 찍고, 역방향으로 돌아온 상태.
         TodoDTO todoDTO = todoService.selectByTno(tno);
         log.info(todoDTO);
+        log.info("페이징 정보 받기 pageRequestDTO getLink(): " + pageRequestDTO.getLink());
         // 서버 -> 웹 화면 데이터 전달. 키 : dto , 값 : 객체
         // 화면에서, 사용시, 키 :dto로 사용하면됨.
         model.addAttribute("dto", todoDTO);
     }
 
     @PostMapping("/remove")
-    public String remove(Long tno, RedirectAttributes redirectAttributes) {
+    public String remove(Long tno,
+                         PageRequestDTO pageRequestDTO
+            ,RedirectAttributes redirectAttributes) {
         log.info("삭제 작업 중.,");
         log.info("tno:"+tno);
+        // 컨트롤러 기능이 없어서, 서비스에게 외주 주기.
         todoService.remove(tno);
+
+        // 화면에 전달,
+        // 쿼리 스트링으로 , 서버 - 화면으로 전달한다.
+        redirectAttributes.addAttribute("page",1);
+        redirectAttributes.addAttribute("size", pageRequestDTO.getSize());
+
         return "redirect:/todo/list";
     }
 

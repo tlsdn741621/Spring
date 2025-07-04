@@ -90,7 +90,7 @@ http://localhost:8080/resources/test.html-->
                                     <th scope="row"><c:out value="${dto.tno}"></c:out></th>
                                         <%--                                    클릭시 : /todo/read?tno=21--%>
                                     <td>
-                                        <a href="/todo/read?tno=${dto.tno}" class="text-decoration-none">
+                                        <a href="/todo/read?tno=${dto.tno}&${pageRequestDTO.link}" class="text-decoration-none">
                                             <c:out value="${dto.title}"/>
                                         </a>
                                     </td>
@@ -110,12 +110,14 @@ http://localhost:8080/resources/test.html-->
 
                             <%--                            페이징 네비게이션 화면 영역--%>
                             <ul class="pagination flex-wrap justify-content-center">
-                                <%--                            이전 버튼--%>
+                                <%--       ui1 이전 버튼--%>
+                                <%--                                화면에서는 ,서버로부터 전달받은 responseDTO 객체(상자) , 꺼내서 이용중--%>
                                 <c:if test="${responseDTO.prev}">
                                     <li class="page-item">
                                         <a class="page-link" data-num="${responseDTO.start - 1}">Prev</a>
                                     </li>
                                 </c:if>
+                                <%--                                    ui2, 페이지네이션 번호 뷰--%>
                                 <c:forEach begin="${responseDTO.start}" end="${responseDTO.end}" var="num">
                                     <li class="page-item ${responseDTO.page == num ? "active" : "" }">
                                         <a class="page-link" data-num="${num}">
@@ -123,7 +125,7 @@ http://localhost:8080/resources/test.html-->
                                         </a>
                                     </li>
                                 </c:forEach>
-                                <%--                        다음 버튼 표시--%>
+                                <%--          ui3, 다음 버튼 표시--%>
                                 <c:if test="${responseDTO.next}">
                                     <li class="page-item">
                                         <a class="page-link" data-num="${responseDTO.end + 1}">Next</a>
