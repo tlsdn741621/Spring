@@ -60,7 +60,7 @@ public class TodoController {
     // /WEB-INF/views/todo/register.jsp , 가리킴.
     // 자동 연결, 뷰 리졸버라는 친구의 업무.
     @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public void register(){
+    public void register() {
         log.info("TodoController에서 작업, register 호출 ");
     }
 
@@ -77,10 +77,10 @@ public class TodoController {
                                BindingResult bindingResult,
                                RedirectAttributes redirectAttributes) {
         log.info("TodoController에서 작업, register , post , 로직처리");
-        log.info("todoDTO:"+todoDTO);
+        log.info("todoDTO:" + todoDTO);
         // 만약, 유효성 체크를 통과 못한다면,
         // bindingResult 여기에 무언가 담겨져 있다.
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             log.info("TodoController에서 작업, register , post d에서. 유효성 오류가 발생했다");
             // 서버 -> 앞 화면에 , 오류가 발생한 이유를 전달.
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
@@ -94,11 +94,12 @@ public class TodoController {
 
         return "redirect:/todo/list";
     }
-    @GetMapping({"/read","/modify"})
+
+    @GetMapping({"/read", "/modify"})
     // 목록 -> 상세보기 : tno 번호와, page, size 정보도 같이 전달함.
     // 한번에 PageRequestDTO 담기,
     // 스프링은 자동으로, PageRequestDTO 내용을 Model 알아서 화면에 전달해줌.
-    public void read(Long tno,PageRequestDTO pageRequestDTO, Model model) {
+    public void read(Long tno, PageRequestDTO pageRequestDTO, Model model) {
         // 서버에서, 디비로 부터 tno 번호로 하나의 todo 정보를 조회
         // 정방향, 찍고, 역방향으로 돌아온 상태.
         TodoDTO todoDTO = todoService.selectByTno(tno);
@@ -112,25 +113,28 @@ public class TodoController {
     @PostMapping("/remove")
     public String remove(Long tno,
                          PageRequestDTO pageRequestDTO
-            ,RedirectAttributes redirectAttributes) {
+            , RedirectAttributes redirectAttributes) {
         log.info("삭제 작업 중.,");
-        log.info("tno:"+tno);
+        log.info("tno:" + tno);
         // 컨트롤러 기능이 없어서, 서비스에게 외주 주기.
         todoService.remove(tno);
 
         // 화면에 전달,
         // 쿼리 스트링으로 , 서버 - 화면으로 전달한다.
-        redirectAttributes.addAttribute("page",1);
+        redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
         redirectAttributes.addAttribute("size", pageRequestDTO.getSize());
 
-        return "redirect:/todo/list";
+        // 삭제 후, (로직처리) PRG 패턴, 쿼리스트링으로, 검색 조건 달아주기.
+        // pageRequestDTO 의 링크를 이용하기.
+        return "redirect:/todo/list?"+pageRequestDTO.getLink();
     }
 
     @PostMapping("/modify")
-    public String modify(@Valid TodoDTO todoDTO,
+    public String modify(PageRequestDTO pageRequestDTO,
+                         @Valid TodoDTO todoDTO,
                          BindingResult bindingResult,
                          RedirectAttributes redirectAttributes) {
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             log.info("수정 적용 부분에서, 유효성 통과 못할 경우");
             redirectAttributes.addFlashAttribute("errors", bindingResult.getAllErrors());
             // 현재 수정 화면에서, 수정할 내용을 입력 후, 유효성 체크 통과를 못했다면,
@@ -142,8 +146,18 @@ public class TodoController {
         }
         log.info("수정 로직처리 post 작업중 넘어온 데이터 확인 todoDTO: " + todoDTO);
         todoService.modify(todoDTO);
+
+        //  수정후, 현재 페이징 정보를 유지하기, 전달하기.
+        // 화면에 전달,
+        // 쿼리 스트링으로 , 서버 - 화면으로 전달한다.
+        redirectAttributes.addAttribute("page", pageRequestDTO.getPage());
+        redirectAttributes.addAttribute("size", pageRequestDTO.getSize());
+        // 수정 후, -> 상세 조회로 이동, : 필요한 준비물, 현재 tno 번호가 필요함.
+        redirectAttributes.addAttribute("tno", todoDTO.getTno());
+
         //PRG 패턴,
-        return "redirect:/todo/list";
+        // 수정 후, -> 상세 조회로 이동,
+        return "redirect:/todo/read";
 
     }
 

@@ -131,7 +131,10 @@ http://localhost:8080/resources/test.html-->
                                     e.preventDefault();
                                     e.stopPropagation();
 
-                                    formObj.action = "/todo/remove"
+                                    // formObj.action = "/todo/remove"
+                                    // 삭제 후, 검색 정보를 유지하기, pageRequsetDTO , 객체에서, link 이용하기.
+                                    // 쿼리 스트링으로, 검색 정보 유지하기.
+                                    formObj.action = '/todo/remove?${pageRequestDTO.link}'
                                     formObj.method = "post"
 
                                     formObj.submit()
